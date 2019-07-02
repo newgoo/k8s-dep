@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: demo-namespace
+  name: to-deployment
+spec:
+  replicas: 2
+  minReadySeconds: 30 # 启动多长时间判定为ready状态
+  revisionHistoryLimit: 10 # 历史版本数
+  paused: false # 是否只做数量维持，不做新版本发布
+  progressDeadlineSeconds: 30  # 处于processing状态的时间，超过则判定为fail状态
+  selector:
+    matchLabels:
+      app: to-container-deploy
+  template:
+    metadata:
+      labels:
+        app: to-container-deploy
+    spec:
+      restartPolicy: Always
+      volumes:
+          - name: share-data
+            hostPath:
+              path: /root/tst
+      containers:
+        - name: nginx-container
+          image: nginx
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: share-data
+              mountPath: /usr/share/nginx/html
+      initContainers:
+        - name: debian-container
+          image: debian
+          volumeMounts:
+            - name: share-data
+              mountPath: /pod-data
+          command: ["/bin/sh"]
+          args: ["-c", "echo hollow world from debian container > /pod-data/index.html"]
+
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  namespace: demo-namespace
+  name: nginx-server
+spec:
+  type: NodePort
+  selector:
+    app: to-container-deploy
+  ports:
+    - port: 80
+      nodePort: 31313

@@ -1,0 +1,23 @@
+# 做是任务，Jenkins 的构建 ，日志处理，资源处理等
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: hello
+  namespace: demo-namespace
+spec:
+  schedule: "*/1 * * * *" # 每分钟运行
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: hello
+              image: busybox
+              args:
+                - /bin/sh
+                - -c
+                - date; echo hello from the kubenetes cluster
+          restartPolicy: OnFailure
+  startingDeadlineSeconds: 10 # job最长启动时间
+  concurrencyPolicy: Allow # 是否允许并行运行，上一个调用还未完成，如果不允许的话，则会等待上一次执行完成之后在执行
+  successfulJobsHistoryLimit: 3 # 允许历史job存留个数

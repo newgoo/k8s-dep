@@ -1,0 +1,18 @@
+# 批量job
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: paral
+  namespace: demo-namespace
+spec:
+  completions: 8
+  parallelism: 2
+  template:
+    spec:
+      containers:
+        - name: paral-1
+          image: contos
+          command: ["/bin/sh"]
+          args: ["-c","sleep 30; date"]
+      restartPolicy: 4

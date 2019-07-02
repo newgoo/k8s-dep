@@ -1,0 +1,20 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  namespace: demo-namespace
+  name: configmap-use-2
+spec:
+  template:
+    spec:
+      containers:
+        - name: hollow-2
+          image: busybox
+          command: ["/bin/sh","-c","ls /etc/config"]
+          volumeMounts:
+            - mountPath: /etc/config
+              name: config-volume
+      volumes:
+        - name: config-volume
+          configMap:
+            name: kube-flannel-cfg
+      restartPolicy: Never

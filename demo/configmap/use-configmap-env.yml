@@ -1,0 +1,20 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  namespace: demo-namespace
+  name: configmap-use-1
+spec:
+  template:
+    spec:
+      containers:
+        - name: hallow-2
+          image: busybox
+          command: ["/bin/sh","-c","echo ${SPECIAL_LEVEL_KEY}"]
+          env:
+            - name: SPECIAL_LEVEL_KEY
+              valueFrom:
+                configMapKeyRef:
+                  name: kube-flannel-cfg
+                  key: special.how
+      restartPolicy: Never
+  backoffLimit: 4

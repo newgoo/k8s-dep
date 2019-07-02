@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: demo-namespace
+  name: kube-flannel-cfg
+  labels:
+    app: flannel
+    tier: node
+data:
+  cni-conf.json: |
+    {
+        "name": "cni-config-name",
+        "type": "flannel",
+        "delegate": {
+            "isDefaultGateway": true
+        }
+
+    }
+  special.how: very
+  special.type: charm
