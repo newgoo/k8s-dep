@@ -1,0 +1,13 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: local-volume
+#  namespace: demo-namespace
+provisioner: kubernetes.io/no-provisioner
+volumeBindingMode: WaitForFirstConsumer # 用户提交pvc后WaitForFirstConsumer不会生成pv对象，到Pod调度到nodeEffect节点后才会绑定这个pv
+allowedTopologies:  # 绑定调度的node节点
+  - matchLabelExpressions:
+      - key: node
+        values:
+          - k8s-node1-label
+reclaimPolicy: Delete

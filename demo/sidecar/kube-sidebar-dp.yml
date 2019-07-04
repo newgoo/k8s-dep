@@ -36,6 +36,7 @@ spec:
           volumeMounts:
             - name: share-data
               mountPath: /pod-data
+#              subPath: /cache1 使用的时候如果有多个容器使用相同的卷，就会使用的这个字段的目录
           command: ["/bin/sh"]
           args: ["-c", "echo hollow world from debian container > /pod-data/index.html"]
 

@@ -1,0 +1,29 @@
+# 多个pod之间共享存储
+apiVersion: v1
+kind: Pod
+metadata:
+  name: volume-test
+  namespace: demo-namespace
+spec:
+  volumes:
+    - name: volume
+      emptyDir: {}
+    - name: volume2
+      hostPath:
+        path: /root/test
+  containers:
+    - name: nginx-1
+      image: nginx
+      volumeMounts:
+        - mountPath: /root/volume
+          name: volume
+          subPath: cache1 # 用于在多个container公用相同存储后文件存储目录
+        - mountPath: /root/volume2
+          name: volume2
+          readOnly: true
+    - name: nginx-2
+      image: nginx
+      volumeMounts:
+        - mountPath: /root/volume3
+          name: volume
+          subPath: cache3 # 用于在多个container公用相同存储后文件存储目录
