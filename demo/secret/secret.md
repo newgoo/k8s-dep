@@ -29,7 +29,7 @@ type: kubernetes.io/dockerconfigjson
 * 命令行自动生成  
 ```bash
 kubectl create secret generic prod-db-secret \
-    --from-literal=username=produser \ 
+    --from-literal=username=produser \
     --from-literal=password=lives \
     -n demo-namespace
 ```

@@ -4,6 +4,11 @@ metadata:
   namespace: demo-namespace
   name: to-deployment
 spec:
+  strategy: # 在升级的过程中如果上一次升级未完成，则会立即杀掉所有上次升级的pod，再使用最新的pod更新
+#    type: Recreate  # 重新创建 先杀掉pod在创建
+    rollingUpdate:  # 滚动更新
+      maxSurge: 25% #先扩容到125% 在缩容到100% 依次循环
+      maxUnavailable: 25# # 先缩容到75% 再扩容到100% 依次循环
   replicas: 2
   minReadySeconds: 30 # 启动多长时间判定为ready状态
   revisionHistoryLimit: 10 # 历史版本数
@@ -19,9 +24,9 @@ spec:
     spec:
       restartPolicy: Always
       volumes:
-          - name: share-data
-            hostPath:
-              path: /root/tst
+        - name: share-data
+          hostPath:
+            path: /root/tst
       containers:
         - name: nginx-container
           image: nginx
@@ -36,7 +41,7 @@ spec:
           volumeMounts:
             - name: share-data
               mountPath: /pod-data
-#              subPath: /cache1 使用的时候如果有多个容器使用相同的卷，就会使用的这个字段的目录
+          #              subPath: /cache1 使用的时候如果有多个容器使用相同的卷，就会使用的这个字段的目录
           command: ["/bin/sh"]
           args: ["-c", "echo hollow world from debian container > /pod-data/index.html"]
 

@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-scheduler
+  namespace: demo-namespace
+  labels:
+    nginx: scheduler
+spec:
+  containers:
+    - name: nginx-scheduler
+      image: nginx
+#  nodeSelector: # 定向调度
+#    node: k8s-node2-label
+  affinity:
+    nodeAffinity: # 节点亲和性调度
+      requiredDuringSchedulingIgnoredDuringExecution: # 必须调度到这些节点
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: node
+                operator: In # NotIn/Exist/DoesNotExist/Gt/Lt
+                values:
+                  - k8s-node2-label
+      preferredDuringSchedulingIgnoredDuringExecution: # 最好调度到这些节点
+        - preference:
+            matchExpressions:
+              - key: node
+                operator: In
+                values:
+                  - k8s-node2-label
+          weight: 1

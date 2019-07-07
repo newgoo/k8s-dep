@@ -1,0 +1,66 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-flag
+  namespace: demo-namespace
+  labels:
+    scheduler: pod-flag
+spec:
+  containers:
+    - name: nginx
+      image: nginx
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-affinity
+  namespace: demo-namespace
+  labels:
+    scheduler: pod-affinity
+spec:
+  containers:
+    - name: nginx
+      image: nginx
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - topologyKey: node #node上的key
+          labelSelector:
+            matchExpressions:
+              - key: scheduler
+                operator: In
+                values:
+                  - pod-flag
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-antiaffinity
+  namespace: demo-namespace
+spec:
+  containers:
+    - name: nginx-antiaffinity
+      image: nginx
+      ports:
+        - containerPort: 80
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - topologyKey: node
+          labelSelector:
+            matchExpressions:
+              - key: scheduler
+                operator: In
+                values:
+                  - pod-affinity
+    podAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - topologyKey: node
+          labelSelector:
+            matchExpressions:
+              - key: scheduler
+                operator: In
+                values:
+                  - pod-flag
