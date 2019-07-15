@@ -1,3 +1,5 @@
+#在使用csi存储组件需要在kubelet(所有节点) kube-scheduler-controller kube-apiserver添加如下启动参数后重启kubelet
+# --feature-gates=VolumeSnapshotDataSource=true,CSINodeInfo=true,CSIDriverRegistry=true
 ---
 # csidriver.yml
 apiVersion: apiextensions.k8s.io/v1beta1
