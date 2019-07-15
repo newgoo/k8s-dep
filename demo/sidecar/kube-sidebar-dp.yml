@@ -54,6 +54,7 @@ metadata:
   name: nginx-server
 spec:
   type: NodePort
+  sessionAffinity: true
   selector:
     app: to-container-deploy
   ports:

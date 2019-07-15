@@ -1,0 +1,78 @@
+---
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: network-policy
+  labels:
+    name: network-policy
+
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  namespace: network-policy
+  name: network-policy
+spec:
+  podSelector:
+    matchLabels:
+      name: network-policy
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              pod: name1
+    - ports:
+        - protocol: TCP
+          port: 80
+---
+apiVersion: v1
+kind: Pod # 192.168.1.117
+metadata:
+  name: name0
+  labels:
+    name: network-policy
+  namespace: network-policy
+spec:
+  containers:
+    - name: nginx-network-policy-1
+      image: gcr.io/google_containers/nginx-slim:0.8
+      ports:
+        - containerPort: 80
+  nodeSelector:
+    node: k8s-node2-label # 192.168.1.0/24
+
+---
+apiVersion: v1
+kind: Pod # 192.168.1.116
+metadata:
+  name: name1
+  labels:
+    pod: nam7uoooe1
+  namespace: network-policy
+spec:
+  containers:
+    - name: nginx-network-policy-1
+      image: gcr.io/google_containers/nginx-slim:0.8
+      ports:
+        - containerPort: 80
+  nodeSelector:
+    node: k8s-node2-label # 192.168.1.0/24
+
+---
+apiVersion: v1
+kind: Pod # 192.168.2.128
+metadata:
+  name: name2
+  namespace: network-policy
+spec:
+  containers:
+    - name: nginx-network-policy-2
+      image: gcr.io/google_containers/nginx-slim:0.8
+      ports:
+        - containerPort: 80
+  nodeSelector:
+    node: k8s-node1-label # 192.168.2.0/24
+

@@ -1,0 +1,74 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: csi-hostpath-sc
+provisioner: csi-hostpath
+reclaimPolicy: Delete
+volumeBindingMode: WaitForFirstConsumer
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: csi-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: csi-hostpath-sc
+
+---
+kind: Pod
+apiVersion: v1
+metadata:
+  name: volume-pv-test
+spec:
+  containers:
+    - name: myfrontend
+      image: nginx
+      volumeMounts:
+        - mountPath: "/usr/share/nginx/html"
+          name: mypd
+  volumes:
+    - name: mypd
+      persistentVolumeClaim:
+        claimName: csi-pvc
+
+#---
+#kind: Pod
+#apiVersion: v1
+#metadata:
+#  name: my-csi-app
+#spec:
+#  containers:
+#    - name: my-csi-app
+#      image: busybox
+#      imagePullPolicy: IfNotPresent
+#      command: [ "sleep", "1000000" ]
+#      volumeMounts:
+#        - mountPath: "/data"
+#          name: my-csi-volume
+#  volumes:
+#    - name: my-csi-volume
+#      persistentVolumeClaim:
+#        claimName: csi-pvc
+
+#---
+#kind: Pod
+#apiVersion: v1
+#metadata:
+#  name: mypod
+#spec:
+#  containers:
+#    - name: myfrontend
+#      image: nginx
+#      volumeMounts:
+#        - mountPath: "/var/www/html"
+#          name: mypd
+#  volumes:
+#    - name: mypd
+#      persistentVolumeClaim:
+#        claimName: csi-pvc

@@ -5,6 +5,7 @@ metadata:
   labels:
     k8s-app: prometheus-operator
   name: prometheus-operator
+#  namespace: demo-namespace
 spec:
   replicas: 1
   selector:
@@ -16,7 +17,7 @@ spec:
         k8s-app: prometheus-operator
     spec:
       containers:
-        - image: quay.io/coreos/prometheus-operator:v0.17.0
+        - image: quay.io/coreos/prometheus-operator:v0.31.1
           imagePullPolicy: IfNotPresent
           name: prometheus-operator
           ports:

@@ -1,0 +1,30 @@
+---
+# 创建角色
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: newgoo-role
+  namespace: newgoo-ns
+rules:
+  - verbs:
+      - "get" # list get create delete patch watch
+      - "list"
+    apiGroups:
+      - "*"
+    resources:
+      - "pods"
+---
+# 角色绑定
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  namespace: newgoo-ns
+  name: newgoo-binding
+roleRef:
+  kind: Role
+  name: newgoo-role
+  apiGroup: ""
+subjects:
+  - kind: User
+    name: newgoo
+    apiGroup: ""
