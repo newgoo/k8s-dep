@@ -1,5 +1,6 @@
 #在使用csi存储组件需要在kubelet(所有节点) kube-scheduler-controller kube-apiserver添加如下启动参数后重启kubelet
 # --feature-gates=VolumeSnapshotDataSource=true,CSINodeInfo=true,CSIDriverRegistry=true
+# 这里注意,由于hostpath只支持单节点，所有这里需要绑定到指定的一个节点，csi-hostpath-provisioner 和 csi-hostpathplugin 必须在同一个节点上
 ---
 # csidriver.yml
 apiVersion: apiextensions.k8s.io/v1beta1
@@ -317,6 +318,8 @@ spec:
         app: csi-hostpath-provisioner
     spec:
       serviceAccountName: csi-provisioner
+      nodeSelector: # 这里注意,由于hostpath只支持单节点，所有这里需要绑定到指定的一个节点
+        node: k8s-node1-label
       containers:
         - name: csi-provisioner
           image: quay.io/k8scsi/csi-provisioner:v1.0.1
@@ -437,6 +440,8 @@ spec:
             - mountPath: /var/lib/kubelet/pods
               mountPropagation: Bidirectional
               name: mountpoint-dir
+      nodeSelector: # # 这里注意,由于hostpath只支持单节点，所有这里需要绑定到指定的一个节点，同上面csi-hostpath-provisioner 在同一个节点
+        node: k8s-node1-label
       volumes:
         - hostPath:
             path: /var/lib/kubelet/plugins/csi-hostpath

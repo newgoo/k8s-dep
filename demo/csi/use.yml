@@ -1,4 +1,4 @@
-apiVersion: storage.k8s.io/v1
+#apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
   name: csi-hostpath-sc
@@ -31,7 +31,10 @@ spec:
       image: nginx
       volumeMounts:
         - mountPath: "/usr/share/nginx/html"
+          subPath: "nginx-volume-pv-test"
           name: mypd
+  nodeSelector: # 这个节点必须是和csi-hostpath-provisioner在同一个节点
+    node: k8s-node1-label
   volumes:
     - name: mypd
       persistentVolumeClaim:
