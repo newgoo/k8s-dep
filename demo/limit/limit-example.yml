@@ -1,0 +1,31 @@
+kind: Pod
+apiVersion: v1
+metadata:
+  name: lrpod
+  namespace: limit-example
+spec:
+  containers:
+    - name: nginx
+      image: nginx
+      resources:
+        limits:
+          memory: 200Mi
+          cpu: 0.4
+    - name: fluentd-elasticsearch
+      image: fluent/fluentd:v1.4-1
+      resources:
+        limits:
+          memory: 200Mi  # 容器启动中通过参数传入给docker
+        requests:
+          cpu: 200m
+          memory: 200Mi
+    - name: fluentd-elasticsearch-2
+      image: fluent/fluentd:v1.4-1
+      resources:
+        requests:
+          cpu: 0.3
+          memory: 200Mi
+        limits:
+          cpu: 0.4
+          memory: 400Mi
+  restartPolicy: Never

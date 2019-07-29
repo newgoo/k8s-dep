@@ -188,7 +188,7 @@ spec:
       serviceAccountName: csi-attacher
       containers:
         - name: csi-attacher
-          image: quay.io/k8scsi/csi-attacher:v1.0.1
+          image: quay.io/k8scsi/csi-attacher:v1.2.0
           imagePullPolicy: IfNotPresent
           args:
             - --v=5
@@ -322,7 +322,7 @@ spec:
         node: k8s-node1-label
       containers:
         - name: csi-provisioner
-          image: quay.io/k8scsi/csi-provisioner:v1.0.1
+          image: quay.io/k8scsi/csi-provisioner:v1.3.0
           imagePullPolicy: IfNotPresent
           args:
             - "--provisioner=csi-hostpath"
@@ -400,7 +400,7 @@ spec:
       hostNetwork: true
       containers:
         - name: driver-registrar
-          image: quay.io/k8scsi/csi-node-driver-registrar:v1.0.1
+          image: quay.io/k8scsi/csi-node-driver-registrar:v1.1.0
           imagePullPolicy: IfNotPresent
           args:
             - --v=5
@@ -418,7 +418,7 @@ spec:
             - mountPath: /registration
               name: registration-dir
         - name: hostpath
-          image: quay.io/k8scsi/hostpathplugin:v1.0.1
+          image: quay.io/k8scsi/hostpathplugin:v1.1.0
           imagePullPolicy: IfNotPresent
           args:
             - "--v=5"
