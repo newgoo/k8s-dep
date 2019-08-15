@@ -68,9 +68,9 @@ spec:
             - mountPath: /etc/prometheus/config
               name: config
               readOnly: true
-#            - mountPath: /prometheus
-#              name: prometheus-data
-              #subPath: prometheus-db
+            - mountPath: /prometheus
+              name: prometheus-data
+              subPath: prometheus-db
             - mountPath: /etc/prometheus/rules/
               name: prometheus-rulefiles
             - mountPath: /etc/prometheus/secrets/etcd-client-cert
@@ -91,13 +91,31 @@ spec:
             secretName: etcd-client-cert
   updateStrategy:
     type: RollingUpdate
-#  volumeClaimTemplates:
-#    - metadata:
-#        name: prometheus-data
-#      spec:
-#        accessModes:
-#          - ReadWriteOnce
-#        resources:
-#          requests:
-#            storage: 1Ti
+  volumeClaimTemplates:
+    - metadata:
+        name: prometheus-data
+        annotations:
+          volume.beta.kubernetes.io/storage-class: "managed-nfs-storage"
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
 #        volumeMode: Filesystem
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: prometheus
+  labels:
+    name: prometheus
+spec:
+  nfs:
+    path: /data/prometheus
+    server: 10.211.55.111
+  accessModes: ["ReadWriteMany", "ReadWriteOnce"]
+  capacity:
+    storage: 1Gi
+

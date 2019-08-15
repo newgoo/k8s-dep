@@ -271,17 +271,21 @@ kind: Service
 metadata:
   name: ingress-nginx
   namespace: ingress-nginx
+  labels:
+    prometheus: k8s
 spec:
-  type: ClusterIP
+  type: NodePort
   ports:
     - name: http
       port: 80
       targetPort: 80
       protocol: TCP
+      nodePort: 31080
     - name: https
       port: 443
       targetPort: 443
       protocol: TCP
+      nodePort: 31443
   selector:
     app.kubernetes.io/name: ingress-nginx
     app.kubernetes.io/part-of: ingress-nginx
