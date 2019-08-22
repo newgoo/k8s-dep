@@ -44,6 +44,12 @@ data:
       scrape_interval: 5s
       static_configs:
         - targets: ['10.211.55.2:8888']
+    - job_name: 'go-node-exporter'
+      metrics_path: "/metrics"
+      scrape_interval: 1s
+      static_configs:
+        - targets: ['10.211.55.111:9100']
+        - targets: ['10.211.55.112:9100']
 #    - job_name: prometheus
 #      honor_labels: false
 #      kubernetes_sd_configs:

@@ -27,9 +27,27 @@ var httpRequestDuration = prometheus.NewSummaryVec(
 	[]string{"endpoint"},
 )
 
+var httpRequestGauge = prometheus.NewGaugeVec(
+	prometheus.GaugeOpts{
+		Name: "http_request_gauge",
+		Help: "http request gauge",
+	},
+	[]string{"endpoint"},
+)
+
+var httpRequestHistogram = prometheus.NewHistogramVec(
+	prometheus.HistogramOpts{
+		Name: "http_request_histogram",
+		Help: "http request histogram",
+	},
+	[]string{"endpoint"},
+)
+
 func init() {
 	prometheus.MustRegister(httpRequestCount)
 	prometheus.MustRegister(httpRequestDuration)
+	prometheus.MustRegister(httpRequestGauge)
+	prometheus.MustRegister(httpRequestHistogram)
 }
 
 func main() {

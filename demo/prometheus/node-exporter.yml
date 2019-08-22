@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: prometheus-node-exporter
+  namespace: kube-system
+  labels:
+    k8s-app: prometheus-node-exporter
+spec:
+  selector:
+    matchLabels:
+      k8s-app: prometheus-node-exporter
+  template:
+    metadata:
+      name: prometheus-node-exporter
+      labels:
+        k8s-app: prometheus-node-exporter
+    spec:
+      volumes:
+        - name: proc
+          hostPath:
+            path: /proc
+        - name: sys
+          hostPath:
+            path: /sys
+        - name: rootfs
+          hostPath:
+            path: /
+      containers:
+        - name: node-exporter
+          image: docker.io/prom/node-exporter:latest
+#          command:
+#            - node-exporter
+#            - --path.rootfs=/host
+#            - --collector.sysfs=/host/sys
+#            - --collector.filesystem.ignored-mount-points="^/(sys|proc|dev|host|etc)($|/)
+          volumeMounts:
+            - mountPath: /host/proc:ro
+              name: proc
+            - mountPath: /rootfs:ro
+              name: rootfs
+            - mountPath: /host/sys:ro
+              name: sys
+          ports:
+            - containerPort: 9100
+      hostNetwork: true

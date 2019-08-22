@@ -3,13 +3,15 @@ kind: Job
 metadata:
   namespace: demo-namespace
   name: configmap-use-2
+  annotations:
+    config: config2
 spec:
   template:
     spec:
       containers:
         - name: hollow-2
           image: busybox
-          command: ["/bin/sh","-c","ls /etc/config"]
+          command: ["sleep","3600"]
           volumeMounts:
             - mountPath: /etc/config
               name: config-volume

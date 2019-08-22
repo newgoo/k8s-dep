@@ -8,8 +8,10 @@ spec:
   containers:
     - name: nginx
       image: nginx
+      ports:
+        - containerPort: 80
   nodeSelector:
-    node: k8s-node2-label
+    kubernetes.io/hostname: k8s-node1
 
 ---
 apiVersion: networking.k8s.io/v1
@@ -22,6 +24,7 @@ spec:
       app: nginx
   policyTypes:
     - Ingress
+#    - Egress
   ingress:
     - from:
         - podSelector:
@@ -45,7 +48,7 @@ spec:
       image: busybox
       command: ["sleep","3600"]
   nodeSelector:
-    node: k8s-node1-label
+    kubernetes.io/hostname: k8s-node1
 
 
 # client2
@@ -60,4 +63,4 @@ spec:
       image: busybox
       command: ["sleep","3600"]
   nodeSelector:
-    node: k8s-node2-label
+    kubernetes.io/hostname: k8s-node1
