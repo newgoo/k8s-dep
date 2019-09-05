@@ -16,3 +16,22 @@ spec:
   selector:
     matchLabels:
       k8s-app: kube-scheduler
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: kube-system
+  name: kube-scheduler
+  labels:
+    k8s-app: kube-scheduler
+spec:
+  selector:
+    component: kube-scheduler
+  type: ClusterIP
+  clusterIP: None
+  ports:
+    - name: http-metrics
+      port: 10251
+      targetPort: 10251
+      protocol: TCP

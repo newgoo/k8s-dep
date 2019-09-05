@@ -60,3 +60,5 @@ spec:
   ports:
     - port: 80
       nodePort: 31313
+  externalIPs:
+    - 10.211.55.110

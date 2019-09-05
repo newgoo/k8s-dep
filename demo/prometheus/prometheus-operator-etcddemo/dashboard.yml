@@ -1,0 +1,26 @@
+# 添加servicemonitoring自定义资源 也就是原生中的scrape_configs的配置
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: kube-dashboard-0
+  namespace: monitoring
+  labels:
+    k8s-app: etcd-k8s
+spec:
+  jobLabel: k8s-app
+  endpoints:
+    - port: https-metrics
+      interval: 30s
+      scheme: https
+      tlsConfig:
+#        caFile: /etc/prometheus/secrets/etcd-certs/ca.crt
+#        certFile: /etc/prometheus/secrets/etcd-certs/healthcheck-client.crt
+#        keyFile: /etc/prometheus/secrets/etcd-certs/healthcheck-client.key
+        #        serverName: xx
+        insecureSkipVerify: true
+  selector:
+    matchlabels:
+      k8s-app: kubernetes-dashboard
+  namespaceSelector:
+    matchNames:
+      - kube-system

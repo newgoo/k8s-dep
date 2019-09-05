@@ -1,0 +1,75 @@
+# 创建etcd证书secret
+#kubectl -n monitoring create secret generic etcd-certs \
+#--from-file=/etc/kubernetes/pki/etcd/healthcheck-client.crt \
+#--from-file=/etc/kubernetes/pki/etcd/healthcheck-client.key \
+#--from-file=/etc/kubernetes/pki/etcd/ca.crt
+#---
+# 在crd prometheus中增加etcd证书
+# kubectl edit  prometheus k8s -n monitoring
+# 在spec.secrets数组中添加 etcd-certs证书
+
+---
+
+# 添加servicemonitoring自定义资源 也就是原生中的scrape_configs的配置
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: etcd-k8s
+  namespace: monitoring
+  labels:
+    k8s-app: etcd
+spec:
+  jobLabel: k8s-app
+  endpoints:
+    - port: https-metrics-etcd
+      interval: 30s
+      scheme: https
+      tlsConfig:
+        caFile: /etc/prometheus/secrets/etcd-certs/ca.crt
+        certFile: /etc/prometheus/secrets/etcd-certs/healthcheck-client.crt
+        keyFile: /etc/prometheus/secrets/etcd-certs/healthcheck-client.key
+        #        serverName: xx
+        insecureSkipVerify: true
+  namespaceSelector:
+    matchNames:
+    - kube-system
+  selector:
+    matchlabels:
+      k8s-app: etcd
+
+---
+# 创建service 和 endpoint 大多数情况配置的etcd都是外部的，所以我们这里采用endpoint方式，即使我们使用的是集群内创建的etcd (手动滑稽)
+apiVersion: v1
+kind: Service
+metadata:
+  name: etcd-k8s
+  namespace: kube-system
+  labels:
+    k8s-app: etcd
+spec:
+  selector:
+    component: etcd
+  type: ClusterIP
+  clusterIP: None
+  ports:
+    - name: https-metrics-etcd
+      port: 2379
+      targetPort: 2379
+      protocol: TCP
+---
+## 创建endpoint
+#apiVersion: v1
+#kind: Endpoints
+#metadata:
+#  name: etcd-k8s
+#  namespace: kube-system
+#  labels:
+#    k8s-app: etcd
+#subsets:
+#  - addresses:
+#      - ip: 10.211.55.110
+#        nodeName: any
+#    ports:
+#      - name: port
+#        port: 2379
+#        protocol: TCP

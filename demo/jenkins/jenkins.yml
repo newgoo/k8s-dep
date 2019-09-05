@@ -22,18 +22,18 @@ spec:
       serviceAccountName: jenkins
       containers:
         - name: jenkins
-          image: jenkins/jenkins:lts-alpine
+          image: jenkins/jenkins
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
             - containerPort: 50000
-          resources:
-            limits:
-              cpu: 1
-              memory: 1Gi
-            requests:
-              cpu: 0.5
-              memory: 500Mi
+#          resources:
+#            limits:
+#              cpu: 1
+#              memory: 1Gi
+#            requests:
+#              cpu: 0.5
+#              memory: 500Mi
           env:
             - name: LIMITS_MEMORY
               valueFrom:
@@ -46,14 +46,12 @@ spec:
           volumeMounts:
             - name: jenkins-home
               mountPath: /var/jenkins_home
-#            - name: dockersock
-#              mountPath: /var/run/docker.sock
-#            - name: docker
-#              mountPath: /bin/docker
+            - name: dockersock
+              mountPath: /var/run/docker.sock
+            - name: docker
+              mountPath: /bin/docker
 #            - name: dockercert
 #              mountPath: /etc/docker
-#            - name: dockerconfig
-#              mountPath: /etc/sysconfig/docker
           livenessProbe:
             httpGet:
               path: /login
@@ -70,19 +68,16 @@ spec:
             failureThreshold: 12 # ~2 minutes
       securityContext:
         fsGroup: 1000
-#      volumes:
-#        - name: dockersock
-#          hostPath:
-#            path: /var/run/docker.sock
-#        - name: docker
-#          hostPath:
-#            path: /bin/docker
+      volumes:
+        - name: dockersock
+          hostPath:
+            path: /var/run/docker.sock
+        - name: docker
+          hostPath:
+            path: /bin/docker
 #        - name: dockercert
 #          hostPath:
 #            path: /etc/docker
-#        - name: dockerconfig
-#          hostPath:
-#            path: /etc/sysconfig/docker
   volumeClaimTemplates:
     - metadata:
         name: jenkins-home
@@ -120,32 +115,32 @@ spec:
       protocol: TCP
       nodePort: 30082
 
-#---
-#apiVersion: extensions/v1beta1
-#kind: Ingress
-#metadata:
-#  name: jenkins
-#  annotations:
-#    nginx.ingress.kubernetes.io/ssl-redirect: "true"
-#    kubernetes.io/tls-acme: "true"
-#    # "413 Request Entity Too Large" uploading plugins, increase client_max_body_size
-#    nginx.ingress.kubernetes.io/proxy-body-size: 50m
-#    nginx.ingress.kubernetes.io/proxy-request-buffering: "off"
-#    # For nginx-ingress controller < 0.9.0.beta-18
-#    ingress.kubernetes.io/ssl-redirect: "true"
-#    # "413 Request Entity Too Large" uploading plugins, increase client_max_body_size
-#    ingress.kubernetes.io/proxy-body-size: 50m
-#    ingress.kubernetes.io/proxy-request-buffering: "off"
-#spec:
-#  rules:
-#    - http:
-#        paths:
-#          - path: /
-#            backend:
-#              serviceName: jenkins
-#              servicePort: 80
-#      host: jenkins.example.com
-#  tls:
-#    - hosts:
-#        - jenkins.example.com
-#      secretName: tls-jenkins
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: jenkins
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    kubernetes.io/tls-acme: "true"
+    # "413 Request Entity Too Large" uploading plugins, increase client_max_body_size
+    nginx.ingress.kubernetes.io/proxy-body-size: 50m
+    nginx.ingress.kubernetes.io/proxy-request-buffering: "off"
+    # For nginx-ingress controller < 0.9.0.beta-18
+    ingress.kubernetes.io/ssl-redirect: "true"
+    # "413 Request Entity Too Large" uploading plugins, increase client_max_body_size
+    ingress.kubernetes.io/proxy-body-size: 50m
+    ingress.kubernetes.io/proxy-request-buffering: "off"
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /
+            backend:
+              serviceName: jenkins
+              servicePort: 80
+      host: jenkins.k8s.com
+  tls:
+    - hosts:
+        - jenkins.k8s.com
+      secretName: tls-jenkins

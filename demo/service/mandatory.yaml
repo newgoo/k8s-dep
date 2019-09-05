@@ -275,6 +275,10 @@ metadata:
     prometheus: k8s
 spec:
   type: NodePort
+  externalIPs:
+    - 10.211.55.110
+    - 10.211.55.111
+    - 10.211.55.112
   ports:
     - name: http
       port: 80
