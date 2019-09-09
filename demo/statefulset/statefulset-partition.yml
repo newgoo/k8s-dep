@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: statefulset-partition
+spec:
+  replicas: 2
+#  podManagementPolicy: Parallel # 默认为 OrderedReady 顺序执行
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      partition: 1
+  selector:
+    matchLabels:
+      name: nginx-partition
+  serviceName: "nginx-partition"
+  template:
+    metadata:
+      name: nginx-partition
+      labels:
+        name: nginx-partition
+    spec:
+      containers:
+        - name: nginx
+          image: nginx
+#          image: nginx:stable-alpine
+          volumeMounts:
+            - mountPath: /usr/share/nginx/html
+              name: nginx-test
+  volumeClaimTemplates:
+    - metadata:
+        name: nginx-test
+        annotations:
+          volume.beta.kubernetes.io/storage-class: "managed-nfs-storage"
+      spec:
+        accessModes:
+          - ReadWriteMany
+        resources:
+          requests:
+            storage: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx
+  labels:
+    app: nginx
+spec:
+  ports:
+    - port: 80
+      name: web
+  selector:
+    name: nginx-partition
+---
+#apiVersion: v1
+#kind: Pod
+#metadata:
+#  name: ss
+#spec:
+#  containers:
+#    - name: nginx
+#      image: nginx
+#      volumeMounts:
+#        - mountPath: /usr/share/nginx/html
+#          name: name
+#  volumes:
+#    - name: name
+#      persistentVolumeClaim:
+#        claimName: nginx-test-statefulset-partition-0
