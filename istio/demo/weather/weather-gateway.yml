@@ -1,0 +1,69 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: weather-gateway
+  namespace: istio-system
+spec:
+  selector:
+    istio: ingressgateway # use istio default controller
+  servers:
+    - port:
+        number: 80
+        name: http
+        protocol: HTTP
+      hosts:
+        - weather.com
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: frontend-dr
+  namespace: weather
+spec:
+  host: frontend.weather.svc.cluster.local
+  subsets:
+    - name: v1
+      labels:
+        version: v1
+    - name: v2
+      exportTo: * #所有命名空间可见，"."表示当前ns可见
+      labels:
+        version: v2
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: frontend-route
+  namespace: weather
+spec:
+  hosts:
+    - weather.com
+  gateways:
+    - istio-system/weather-gateway
+  http: # 循序优先级匹配
+    - match:
+        - sourceLabels:
+            app: frontend
+            version: v2
+        - port: 80
+        - header:
+            cookie:
+              regex: "*"
+        - uri:
+            prefex: "/"
+      fault: # 对来源 sourcelables 的访问 增加20s延迟
+        delay:
+          fixDelay: 20s
+      route:
+        - destination:
+            host: frontend.weather.svc.cluster.local
+            port:
+              number: 3000
+            subset: v1
+          weight: 80 # 流量占比
+        - destination:
+            host: frontend.weather.svc.cluster.local
+            port:
+              number: 80
+            subset: v2
+          weight: 20

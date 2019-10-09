@@ -213,7 +213,7 @@ spec:
       serviceAccountName: nginx-ingress-serviceaccount
       containers:
         - name: nginx-ingress-controller
-          image: quay.io/kubernetes-ingress-controller/nginx-ingress-controller:0.25.0
+          image: registry.cn-shenzhen.aliyuncs.com/newgoo/nginx-ingress-controller:0.25.0
           args:
             - /nginx-ingress-controller
             - --configmap=$(POD_NAMESPACE)/nginx-configuration
@@ -274,22 +274,21 @@ metadata:
   labels:
     prometheus: k8s
 spec:
-  type: NodePort
+  type: ClusterIP
   externalIPs:
-    - 10.211.55.110
-    - 10.211.55.111
-    - 10.211.55.112
+    - 192.168.0.196
+    - 192.168.0.197
+    - 192.168.0.199
+    - 192.168.0.253
   ports:
     - name: http
       port: 80
       targetPort: 80
       protocol: TCP
-      nodePort: 31080
     - name: https
       port: 443
       targetPort: 443
       protocol: TCP
-      nodePort: 31443
   selector:
     app.kubernetes.io/name: ingress-nginx
     app.kubernetes.io/part-of: ingress-nginx

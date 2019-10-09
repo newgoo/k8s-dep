@@ -3,27 +3,96 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: volume-test
-  namespace: demo-namespace
+#  namespace: demo-namespace
+  labels:
+    app: volume-test
+    istio-injection: enabled
 spec:
   volumes:
     - name: volume
       emptyDir: {}
-    - name: volume2
-      hostPath:
-        path: /root/test
   containers:
     - name: nginx-1
       image: nginx
       volumeMounts:
-        - mountPath: /root/volume
+        - mountPath: /usr/share/nginx/html
           name: volume
-          subPath: cache1 # 用于在多个container公用相同存储后文件存储目录
-        - mountPath: /root/volume2
-          name: volume2
-          readOnly: true
-    - name: nginx-2
-      image: nginx
+  initContainers:
+    - name: debian-container
+      image: debian
+      command:
+        - /bin/bash
+      args: ["-c", "echo From Shared Data >  /root/volume3/index.html"]
       volumeMounts:
         - mountPath: /root/volume3
           name: volume
-          subPath: cache3 # 用于在多个container公用相同存储后文件存储目录
+---
+#apiVersion: apps/v1
+#kind: ReplicaSet
+#metadata:
+#  name: volume-test
+#  labels:
+#    app: volume-test
+#spec:
+#  template:
+#    metadata:
+#      name: volume-test
+#      labels:
+#        app: volume-test
+#    spec:
+#      volumes:
+#        - name: volume
+#          emptyDir: {}
+#      containers:
+#        - name: nginx-1
+#          image: nginx
+#          volumeMounts:
+#            - mountPath: /usr/share/nginx/html
+#              name: volume
+#      initContainers:
+#        - name: debian-container
+#          image: debian
+#          command:
+#            - /bin/bash
+#          args: ["-c", "echo From Shared Data >  /root/volume3/index.html"]
+#          volumeMounts:
+#            - mountPath: /root/volume3
+#              name: volume
+#  selector:
+#    matchLabels:
+#      app: volume-test
+#---
+#apiVersion: apps/v1
+#kind: Deployment
+#metadata:
+#  name: volume-test
+#  labels:
+#    app: volume-test
+#spec:
+#  selector:
+#    matchLabels:
+#      app: volume-test
+#  template:
+#    metadata:
+#      name: volume-test
+#      labels:
+#        app: volume-test
+#    spec:
+#      volumes:
+#        - name: volume
+#          emptyDir: {}
+#      containers:
+#        - name: nginx-1
+#          image: nginx
+#          volumeMounts:
+#            - mountPath: /usr/share/nginx/html
+#              name: volume
+#      initContainers:
+#        - name: debian-container
+#          image: debian
+#          command:
+#            - /bin/bash
+#          args: ["-c", "echo From Shared Data >  /root/volume3/index.html"]
+#          volumeMounts:
+#            - mountPath: /root/volume3
+#              name: volume
